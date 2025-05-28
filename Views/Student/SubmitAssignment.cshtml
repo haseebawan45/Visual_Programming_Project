@@ -1,0 +1,120 @@
+@model AuthWebApp.ViewModels.SubmitAssignmentViewModel
+
+@{
+    ViewData["Title"] = "Submit Assignment";
+}
+
+<div class="container py-4">
+    <h2>@ViewData["Title"]</h2>
+    
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <a asp-action="Assignments" class="btn btn-secondary mb-3">Back to Assignments</a>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">@Model.Title</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-3 fw-bold">Course:</div>
+                        <div class="col-md-9">@Model.CourseTitle</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3 fw-bold">Due Date:</div>
+                        <div class="col-md-9">
+                            @Model.DueDate.ToShortDateString() 
+                            @{
+                                var daysLeft = (Model.DueDate - DateTime.Today).Days;
+                                
+                                if (daysLeft < 0)
+                                {
+                                    <span class="badge bg-danger ms-2">@Math.Abs(daysLeft) days overdue</span>
+                                }
+                                else if (daysLeft == 0)
+                                {
+                                    <span class="badge bg-warning ms-2">Due today</span>
+                                }
+                                else if (daysLeft <= 2)
+                                {
+                                    <span class="badge bg-warning ms-2">@daysLeft days left</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success ms-2">@daysLeft days left</span>
+                                }
+                            }
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-3 fw-bold">Description:</div>
+                        <div class="col-md-9">@Model.Description</div>
+                    </div>
+                    
+                    <div class="border-top pt-3">
+                        <h5 class="mb-3">Submit Your Assignment</h5>
+                        <form asp-action="SubmitAssignment" method="post" enctype="multipart/form-data">
+                            <input type="hidden" asp-for="AssignmentId" />
+                            
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            
+                            <div class="form-group mb-4">
+                                <label asp-for="File" class="form-label"></label>
+                                <input asp-for="File" class="form-control" type="file" />
+                                <span asp-validation-for="File" class="text-danger"></span>
+                                <div class="form-text">
+                                    Upload your assignment file. Supported formats: .pdf, .docx, .xlsx, .pptx, .zip, .txt (Max: 20MB)
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">Submit Assignment</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Submission Guidelines</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            Make sure your file name includes your name and student ID
+                        </li>
+                        <li class="list-group-item">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            Ensure your assignment meets all requirements in the description
+                        </li>
+                        <li class="list-group-item">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            Maximum file size is 20MB
+                        </li>
+                        <li class="list-group-item">
+                            <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+                            Late submissions may receive reduced grades
+                        </li>
+                        <li class="list-group-item">
+                            <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+                            Once submitted, you cannot resubmit unless approved by instructor
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+} 

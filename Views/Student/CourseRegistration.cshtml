@@ -1,0 +1,176 @@
+@model IEnumerable<AuthWebApp.Models.Course>
+
+@{
+    ViewData["Title"] = "Course Registration";
+}
+
+<div class="container py-4">
+    <h2>@ViewData["Title"]</h2>
+    
+    <div class="row mb-4">
+        <div class="col-md-12 d-flex justify-content-between align-items-center">
+            <p class="lead">Browse and register for available courses</p>
+            <a asp-action="Courses" class="btn btn-secondary">Back to My Courses</a>
+        </div>
+    </div>
+    
+    @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+    {
+        <div class="alert alert-danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+    
+    <div class="row">
+        <div class="col-md-12">
+            @if (Model != null && Model.Any())
+            {
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="coursesTable">
+                                <thead>
+                                    <tr>
+                                        <th>Course Code</th>
+                                        <th>Title</th>
+                                        <th>Credit Hours</th>
+                                        <th>Description</th>
+                                        <th>Capacity</th>
+                                        <th>Prerequisites</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var course in Model)
+                                    {
+                                        <tr>
+                                            <td>@course.CourseCode</td>
+                                            <td>@course.Title</td>
+                                            <td>@course.CreditHours</td>
+                                            <td>@(course.Description != null ? (course.Description.Length > 50 ? course.Description.Substring(0, 50) + "..." : course.Description) : "No description")</td>
+                                            <td>@course.MaxCapacity</td>
+                                            <td>
+                                                @if (string.IsNullOrEmpty(course.Prerequisites))
+                                                {
+                                                    <span class="text-success">None</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-warning">Required</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <form asp-action="RegisterCourse" method="post" class="d-inline">
+                                                    <input type="hidden" name="courseId" value="@course.CourseId" />
+                                                    <button type="submit" class="btn btn-sm btn-primary">Register</button>
+                                                </form>
+                                                <button type="button" class="btn btn-sm btn-outline-info" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#courseDetailModal" 
+                                                        data-course-id="@course.CourseId"
+                                                        data-course-code="@course.CourseCode"
+                                                        data-course-title="@course.Title"
+                                                        data-course-description="@course.Description"
+                                                        data-course-credits="@course.CreditHours"
+                                                        data-course-capacity="@course.MaxCapacity"
+                                                        data-course-prerequisites="@course.Prerequisites">
+                                                    Details
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <p class="mb-0">No available courses for registration at this time.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Course Detail Modal -->
+<div class="modal fade" id="courseDetailModal" tabindex="-1" aria-labelledby="courseDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="courseDetailModalLabel">Course Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4 fw-bold">Course Code:</div>
+                    <div class="col-md-8" id="modalCourseCode"></div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-4 fw-bold">Title:</div>
+                    <div class="col-md-8" id="modalCourseTitle"></div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-4 fw-bold">Credit Hours:</div>
+                    <div class="col-md-8" id="modalCourseCredits"></div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-4 fw-bold">Maximum Capacity:</div>
+                    <div class="col-md-8" id="modalCourseCapacity"></div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-4 fw-bold">Description:</div>
+                    <div class="col-md-8" id="modalCourseDescription"></div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-4 fw-bold">Prerequisites:</div>
+                    <div class="col-md-8" id="modalCoursePrerequisites"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <form id="registerForm" asp-action="RegisterCourse" method="post">
+                    <input type="hidden" name="courseId" id="modalCourseId" />
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Register for Course</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Initialize DataTable for search/filtering
+            $('#coursesTable').DataTable({
+                "paging": true,
+                "searching": true,
+                "ordering": true,
+                "info": true
+            });
+            
+            // Course detail modal population
+            $('#courseDetailModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var courseId = button.data('course-id');
+                var courseCode = button.data('course-code');
+                var courseTitle = button.data('course-title');
+                var courseDescription = button.data('course-description');
+                var courseCredits = button.data('course-credits');
+                var courseCapacity = button.data('course-capacity');
+                var coursePrerequisites = button.data('course-prerequisites');
+                
+                var modal = $(this);
+                modal.find('#modalCourseId').val(courseId);
+                modal.find('#modalCourseCode').text(courseCode);
+                modal.find('#modalCourseTitle').text(courseTitle);
+                modal.find('#modalCourseDescription').text(courseDescription || 'No description available');
+                modal.find('#modalCourseCredits').text(courseCredits);
+                modal.find('#modalCourseCapacity').text(courseCapacity);
+                modal.find('#modalCoursePrerequisites').text(coursePrerequisites ? 'Required' : 'None');
+            });
+        });
+    </script>
+} 

@@ -1,0 +1,166 @@
+@model AuthWebApp.ViewModels.StudentDashboardViewModel
+
+@{
+    ViewData["Title"] = "Student Dashboard";
+}
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2>Welcome, @Model.Student.FirstName!</h2>
+            <p class="lead">Student ID: @Model.Student.StudentId | Program: @Model.Student.Program | Semester: @Model.Student.Semester</p>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">My Courses</h5>
+                    <a asp-action="CourseRegistration" class="btn btn-primary btn-sm">Register for Courses</a>
+                </div>
+                <div class="card-body">
+                    @if (Model.RegisteredCourses != null && Model.RegisteredCourses.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Course Code</th>
+                                        <th>Title</th>
+                                        <th>Credit Hours</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var registration in Model.RegisteredCourses)
+                                    {
+                                        <tr>
+                                            <td>@registration.Course.CourseCode</td>
+                                            <td>@registration.Course.Title</td>
+                                            <td>@registration.Course.CreditHours</td>
+                                            <td>
+                                                <span class="badge @(registration.Status == AuthWebApp.Models.RegistrationStatus.Approved ? "bg-success" : 
+                                                       registration.Status == AuthWebApp.Models.RegistrationStatus.Pending ? "bg-warning text-dark" : "bg-danger")">
+                                                    @registration.Status
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="mb-0">You are not registered for any courses yet.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Pending Assignments</h5>
+                    <a asp-action="Assignments" class="btn btn-primary btn-sm">View All</a>
+                </div>
+                <div class="card-body">
+                    @if (Model.PendingAssignments != null && Model.PendingAssignments.Any())
+                    {
+                        <div class="list-group">
+                            @foreach (var assignment in Model.PendingAssignments.Take(5))
+                            {
+                                <a asp-action="SubmitAssignment" asp-route-id="@assignment.AssignmentId" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">@assignment.Title</h6>
+                                        <small>Due: @assignment.DueDate.ToShortDateString()</small>
+                                    </div>
+                                    <p class="mb-1">@assignment.Course.Title</p>
+                                    @{
+                                        var daysLeft = (assignment.DueDate - DateTime.Today).Days;
+                                    }
+                                    <small class="@(daysLeft < 3 ? "text-danger" : "text-muted")">
+                                        @if (daysLeft == 0)
+                                        {
+                                            <span>Due today!</span>
+                                        }
+                                        else if (daysLeft == 1)
+                                        {
+                                            <span>Due tomorrow!</span>
+                                        }
+                                        else
+                                        {
+                                            <span>@daysLeft days left</span>
+                                        }
+                                    </small>
+                                </a>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="mb-0">No pending assignments.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Fee Status</h5>
+                    <a asp-action="Fees" class="btn btn-primary btn-sm">View Details</a>
+                </div>
+                <div class="card-body">
+                    @if (Model.OutstandingFees != null && Model.OutstandingFees.Any())
+                    {
+                        <div class="list-group">
+                            @foreach (var fee in Model.OutstandingFees.Take(5))
+                            {
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">@fee.Semester Fee</h6>
+                                        <small class="@(fee.Status == AuthWebApp.Models.FeeStatus.Overdue ? "text-danger" : "text-muted")">
+                                            Due: @fee.DueDate.ToShortDateString()
+                                        </small>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <p class="mb-1">@fee.Amount.ToString("C")</p>
+                                        <span class="badge @(fee.Status == AuthWebApp.Models.FeeStatus.Pending ? "bg-warning text-dark" : 
+                                              fee.Status == AuthWebApp.Models.FeeStatus.Paid ? "bg-success" : 
+                                              fee.Status == AuthWebApp.Models.FeeStatus.Waived ? "bg-info" : "bg-danger")">
+                                            @fee.Status
+                                        </span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="mb-0">No outstanding fees.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Highlight cards on hover
+            $(".card").hover(
+                function () {
+                    $(this).addClass("shadow-sm");
+                },
+                function () {
+                    $(this).removeClass("shadow-sm");
+                }
+            );
+        });
+    </script>
+} 

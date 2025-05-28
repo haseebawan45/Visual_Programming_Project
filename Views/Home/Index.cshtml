@@ -1,0 +1,139 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+
+@section FullWidthContent {
+    <div class="container-fluid p-0">
+        <!-- Hero Section -->
+        <div class="py-5 bg-light">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-7">
+                        <h1 class="display-4 fw-bold mb-3">Smart Campus Portal</h1>
+                        <p class="lead text-muted mb-4">A comprehensive web-based system for university automation.</p>
+                        <p class="mb-4">Manage courses, assignments, grades, and more - all in one place.</p>
+                        <div class="d-flex gap-3">
+                            <a href="#features" class="btn btn-primary px-4 py-2">Learn More</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-5">
+                        <img src="https://via.placeholder.com/500x300?text=Campus+Portal" class="img-fluid rounded shadow" alt="Campus Portal">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div id="features" class="py-5">
+            <div class="container">
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    <!-- Student Card -->
+                    <div class="col">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center p-4">
+                                <div class="text-primary mb-3">
+                                    <i class="bi bi-mortarboard-fill" style="font-size: 3rem;"></i>
+                                </div>
+                                <h3 class="card-title mb-3">Students</h3>
+                                <p class="card-text">Register for courses, view grades, submit assignments, and track your academic progress.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Faculty Card -->
+                    <div class="col">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center p-4">
+                                <div class="text-primary mb-3">
+                                    <i class="bi bi-easel-fill" style="font-size: 3rem;"></i>
+                                </div>
+                                <h3 class="card-title mb-3">Faculty</h3>
+                                <p class="card-text">Manage courses, create assignments, grade submissions, and communicate with students.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Administration Card -->
+                    <div class="col">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center p-4">
+                                <div class="text-primary mb-3">
+                                    <i class="bi bi-building-fill" style="font-size: 3rem;"></i>
+                                </div>
+                                <h3 class="card-title mb-3">Administration</h3>
+                                <p class="card-text">Oversee campus operations, manage users, generate reports, and ensure smooth functioning.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Benefits Section -->
+        <div class="py-5 bg-light">
+            <div class="container">
+                <h2 class="text-center mb-5">Why Choose Smart Campus Portal?</h2>
+                <div class="row g-4">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <i class="bi bi-speedometer2 text-primary" style="font-size: 2rem;"></i>
+                            </div>
+                            <div>
+                                <h5>Efficient</h5>
+                                <p>Streamline administrative tasks and save valuable time</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <i class="bi bi-shield-check text-primary" style="font-size: 2rem;"></i>
+                            </div>
+                            <div>
+                                <h5>Secure</h5>
+                                <p>Advanced security measures to protect sensitive data</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <i class="bi bi-phone text-primary" style="font-size: 2rem;"></i>
+                            </div>
+                            <div>
+                                <h5>Responsive</h5>
+                                <p>Works on all devices from desktops to smartphones</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <i class="bi bi-graph-up-arrow text-primary" style="font-size: 2rem;"></i>
+                            </div>
+                            <div>
+                                <h5>Analytics</h5>
+                                <p>Detailed reports and analytics for informed decisions</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+}

@@ -1,0 +1,7 @@
+D:\Programmings\asp_project\AuthWebApp\obj\Debug\net9.0\AuthWebApp.GeneratedMSBuildEditorConfig.editorconfig
+D:\Programmings\asp_project\AuthWebApp\obj\Debug\net9.0\AuthWebApp.AssemblyInfoInputs.cache
+D:\Programmings\asp_project\AuthWebApp\obj\Debug\net9.0\AuthWebApp.AssemblyInfo.cs
+D:\Programmings\asp_project\AuthWebApp\obj\Debug\net9.0\AuthWebApp.csproj.CoreCompileInputs.cache
+D:\Programmings\asp_project\AuthWebApp\obj\Debug\net9.0\AuthWebApp.MvcApplicationPartsAssemblyInfo.cache
+D:\Programmings\asp_project\AuthWebApp\obj\Debug\net9.0\AuthWebApp.RazorAssemblyInfo.cache
+D:\Programmings\asp_project\AuthWebApp\obj\Debug\net9.0\AuthWebApp.RazorAssemblyInfo.cs

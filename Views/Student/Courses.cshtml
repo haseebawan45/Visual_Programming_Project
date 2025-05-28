@@ -1,0 +1,92 @@
+@model IEnumerable<AuthWebApp.Models.CourseRegistration>
+
+@{
+    ViewData["Title"] = "My Courses";
+}
+
+<div class="container py-4">
+    <h2>@ViewData["Title"]</h2>
+    
+    <div class="row mb-4">
+        <div class="col-md-12 d-flex justify-content-between align-items-center">
+            <p class="lead">Manage your course registrations</p>
+            <a asp-action="CourseRegistration" class="btn btn-primary">Register for New Courses</a>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            @if (Model != null && Model.Any())
+            {
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Course Code</th>
+                                        <th>Title</th>
+                                        <th>Credit Hours</th>
+                                        <th>Semester</th>
+                                        <th>Registration Date</th>
+                                        <th>Status</th>
+                                        <th>Grade</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var registration in Model)
+                                    {
+                                        <tr>
+                                            <td>@registration.Course.CourseCode</td>
+                                            <td>@registration.Course.Title</td>
+                                            <td>@registration.Course.CreditHours</td>
+                                            <td>@registration.Course.Semester</td>
+                                            <td>@registration.RegistrationDate.ToShortDateString()</td>
+                                            <td>
+                                                <span class="badge @(registration.Status == AuthWebApp.Models.RegistrationStatus.Approved ? "bg-success" : 
+                                                   registration.Status == AuthWebApp.Models.RegistrationStatus.Pending ? "bg-warning text-dark" : 
+                                                   registration.Status == AuthWebApp.Models.RegistrationStatus.Rejected ? "bg-danger" : "bg-secondary")">
+                                                    @registration.Status
+                                                </span>
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(registration.Grade))
+                                                {
+                                                    <span>@registration.Grade</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Not graded</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (registration.Status == AuthWebApp.Models.RegistrationStatus.Pending)
+                                                {
+                                                    <form asp-action="WithdrawCourse" method="post" class="d-inline">
+                                                        <input type="hidden" name="registrationId" value="@registration.RegistrationId" />
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger">Withdraw</button>
+                                                    </form>
+                                                }
+                                                else if (registration.Status == AuthWebApp.Models.RegistrationStatus.Approved)
+                                                {
+                                                    <a href="#" class="btn btn-sm btn-outline-primary">View Details</a>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <p class="mb-0">You are not registered for any courses yet.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div> 

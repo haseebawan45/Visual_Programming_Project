@@ -1,0 +1,81 @@
+@model AuthWebApp.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = "Student Profile";
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Profile Picture</h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <img src="https://via.placeholder.com/150" class="img-fluid rounded-circle" alt="Profile Picture" style="width: 150px; height: 150px;">
+                    </div>
+                    <h5>@Model.FirstName @Model.LastName</h5>
+                    <p class="text-muted">@Model.Email</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Student Information</h5>
+                    <a asp-action="EditProfile" class="btn btn-primary btn-sm">Edit Profile</a>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Student ID:</div>
+                        <div class="col-md-8">@Model.StudentId</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Full Name:</div>
+                        <div class="col-md-8">@Model.FirstName @Model.LastName</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Email:</div>
+                        <div class="col-md-8">@Model.Email</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Program/Major:</div>
+                        <div class="col-md-8">@(Model.Program ?? "Not specified")</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Current Semester:</div>
+                        <div class="col-md-8">@(Model.Semester.HasValue ? Model.Semester.Value.ToString() : "Not specified")</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">GPA:</div>
+                        <div class="col-md-8">@(Model.GPA.HasValue ? Model.GPA.Value.ToString("F2") : "N/A")</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Account Settings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Change Password
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Notification Settings
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Privacy Settings
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

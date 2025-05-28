@@ -1,0 +1,179 @@
+@model IEnumerable<AuthWebApp.Models.FeeRecord>
+
+@{
+    ViewData["Title"] = "Fee Details";
+}
+
+<div class="container py-4">
+    <h2>@ViewData["Title"]</h2>
+    
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <p class="lead">View and manage your tuition fees</p>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Fee Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Total Paid</h6>
+                                    <p class="card-text display-6 text-success">
+                                        @Model.Where(f => f.Status == AuthWebApp.Models.FeeStatus.Paid)
+                                            .Sum(f => f.Amount)
+                                            .ToString("C")
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Pending</h6>
+                                    <p class="card-text display-6 text-warning">
+                                        @Model.Where(f => f.Status == AuthWebApp.Models.FeeStatus.Pending)
+                                            .Sum(f => f.Amount)
+                                            .ToString("C")
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Overdue</h6>
+                                    <p class="card-text display-6 text-danger">
+                                        @Model.Where(f => f.Status == AuthWebApp.Models.FeeStatus.Overdue)
+                                            .Sum(f => f.Amount)
+                                            .ToString("C")
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Fee Records</h5>
+                    <div>
+                        <button class="btn btn-outline-primary">Payment History</button>
+                        <button class="btn btn-primary ms-2">Make Payment</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (Model != null && Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Semester</th>
+                                        <th>Amount</th>
+                                        <th>Due Date</th>
+                                        <th>Payment Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var fee in Model.OrderByDescending(f => f.DueDate))
+                                    {
+                                        <tr>
+                                            <td>@fee.Semester</td>
+                                            <td>@fee.Amount.ToString("C")</td>
+                                            <td>@fee.DueDate.ToShortDateString()</td>
+                                            <td>
+                                                @if (fee.PaymentDate.HasValue)
+                                                {
+                                                    @fee.PaymentDate.Value.ToShortDateString()
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Not paid</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="badge @(fee.Status == AuthWebApp.Models.FeeStatus.Paid ? "bg-success" : 
+                                                       fee.Status == AuthWebApp.Models.FeeStatus.Pending ? "bg-warning text-dark" : 
+                                                       fee.Status == AuthWebApp.Models.FeeStatus.Waived ? "bg-info" : "bg-danger")">
+                                                    @fee.Status
+                                                </span>
+                                            </td>
+                                            <td>
+                                                @if (fee.Status == AuthWebApp.Models.FeeStatus.Paid)
+                                                {
+                                                    <button type="button" class="btn btn-sm btn-outline-primary" 
+                                                            data-bs-toggle="modal" 
+                                                            data-bs-target="#receiptModal-@fee.FeeId">
+                                                        View Receipt
+                                                    </button>
+                                                    
+                                                    <!-- Receipt Modal -->
+                                                    <div class="modal fade" id="receiptModal-@fee.FeeId" tabindex="-1" aria-labelledby="receiptModalLabel-@fee.FeeId" aria-hidden="true">
+                                                        <div class="modal-dialog">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="receiptModalLabel-@fee.FeeId">Payment Receipt</h5>
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <div class="row mb-2">
+                                                                        <div class="col-md-4 fw-bold">Semester:</div>
+                                                                        <div class="col-md-8">@fee.Semester</div>
+                                                                    </div>
+                                                                    <div class="row mb-2">
+                                                                        <div class="col-md-4 fw-bold">Amount:</div>
+                                                                        <div class="col-md-8">@fee.Amount.ToString("C")</div>
+                                                                    </div>
+                                                                    <div class="row mb-2">
+                                                                        <div class="col-md-4 fw-bold">Payment Date:</div>
+                                                                        <div class="col-md-8">@fee.PaymentDate?.ToShortDateString()</div>
+                                                                    </div>
+                                                                    <div class="row mb-2">
+                                                                        <div class="col-md-4 fw-bold">Reference No:</div>
+                                                                        <div class="col-md-8">@fee.PaymentReference</div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-primary">Print Receipt</button>
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                                else if (fee.Status == AuthWebApp.Models.FeeStatus.Pending || fee.Status == AuthWebApp.Models.FeeStatus.Overdue)
+                                                {
+                                                    <button class="btn btn-sm btn-success">Pay Now</button>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <p class="mb-0">No fee records found.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
