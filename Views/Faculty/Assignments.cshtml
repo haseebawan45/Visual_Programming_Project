@@ -1,0 +1,197 @@
+@model IEnumerable<AuthWebApp.Models.Assignment>
+
+@{
+    ViewData["Title"] = "Assignments";
+}
+
+<div class="container py-4">
+    <h2>@ViewData["Title"]</h2>
+    
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <p class="lead">Manage assignments and grade student submissions</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" id="assignmentTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all-assignments" type="button" role="tab" aria-controls="all-assignments" aria-selected="true">
+                                All Assignments
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending-assignments" type="button" role="tab" aria-controls="pending-assignments" aria-selected="false">
+                                Pending Grading
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="graded-tab" data-bs-toggle="tab" data-bs-target="#graded-assignments" type="button" role="tab" aria-controls="graded-assignments" aria-selected="false">
+                                Graded
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="assignmentTabsContent">
+                        <div class="tab-pane fade show active" id="all-assignments" role="tabpanel" aria-labelledby="all-tab">
+                            @if (Model.Any())
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Course</th>
+                                                <th>Title</th>
+                                                <th>Due Date</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var assignment in Model)
+                                            {
+                                                <tr>
+                                                    <td>@assignment.Course.CourseCode</td>
+                                                    <td>@assignment.Title</td>
+                                                    <td>@assignment.DueDate.ToString("MMM dd, yyyy")</td>
+                                                    <td>
+                                                        @if (assignment.StudentId != null && assignment.Grade.HasValue)
+                                                        {
+                                                            <span class="badge bg-success">Graded</span>
+                                                        }
+                                                        else if (assignment.StudentId != null)
+                                                        {
+                                                            <span class="badge bg-warning">Submitted - Needs Grading</span>
+                                                        }
+                                                        else if (assignment.DueDate < DateTime.Now)
+                                                        {
+                                                            <span class="badge bg-danger">Overdue</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge bg-primary">Active</span>
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @if (assignment.StudentId != null && !assignment.Grade.HasValue)
+                                                        {
+                                                            <a asp-action="GradeAssignment" asp-route-id="@assignment.AssignmentId" class="btn btn-sm btn-primary">Grade</a>
+                                                        }
+                                                        else if (assignment.StudentId != null && assignment.Grade.HasValue)
+                                                        {
+                                                            <a asp-action="GradeAssignment" asp-route-id="@assignment.AssignmentId" class="btn btn-sm btn-outline-primary">View/Edit</a>
+                                                        }
+                                                        <a asp-action="CourseDetails" asp-route-id="@assignment.CourseId" class="btn btn-sm btn-outline-secondary">Course</a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                            else
+                            {
+                                <p>No assignments found.</p>
+                            }
+                        </div>
+                        <div class="tab-pane fade" id="pending-assignments" role="tabpanel" aria-labelledby="pending-tab">
+                            @{
+                                var pendingAssignments = Model.Where(a => a.StudentId != null && !a.Grade.HasValue);
+                            }
+                            
+                            @if (pendingAssignments.Any())
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Course</th>
+                                                <th>Title</th>
+                                                <th>Student</th>
+                                                <th>Submission Date</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var assignment in pendingAssignments)
+                                            {
+                                                <tr>
+                                                    <td>@assignment.Course.CourseCode</td>
+                                                    <td>@assignment.Title</td>
+                                                    <td>@(assignment.Student?.FirstName) @(assignment.Student?.LastName)</td>
+                                                    <td>@assignment.SubmissionDate?.ToString("MMM dd, yyyy HH:mm")</td>
+                                                    <td>
+                                                        <a asp-action="GradeAssignment" asp-route-id="@assignment.AssignmentId" class="btn btn-sm btn-primary">Grade</a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                            else
+                            {
+                                <p>No assignments pending grading.</p>
+                            }
+                        </div>
+                        <div class="tab-pane fade" id="graded-assignments" role="tabpanel" aria-labelledby="graded-tab">
+                            @{
+                                var gradedAssignments = Model.Where(a => a.StudentId != null && a.Grade.HasValue);
+                            }
+                            
+                            @if (gradedAssignments.Any())
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Course</th>
+                                                <th>Title</th>
+                                                <th>Student</th>
+                                                <th>Grade</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var assignment in gradedAssignments)
+                                            {
+                                                <tr>
+                                                    <td>@assignment.Course.CourseCode</td>
+                                                    <td>@assignment.Title</td>
+                                                    <td>@(assignment.Student?.FirstName) @(assignment.Student?.LastName)</td>
+                                                    <td>@assignment.Grade</td>
+                                                    <td>
+                                                        <a asp-action="GradeAssignment" asp-route-id="@assignment.AssignmentId" class="btn btn-sm btn-outline-primary">View/Edit</a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                            else
+                            {
+                                <p>No graded assignments found.</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function() {
+            $('#assignmentTabs button').on('click', function (e) {
+                e.preventDefault();
+                $(this).tab('show');
+            });
+        });
+    </script>
+} 

@@ -1,0 +1,212 @@
+@model AuthWebApp.ViewModels.RegistrationReportViewModel
+
+@{
+    ViewData["Title"] = "Course Registration Report";
+}
+
+<div class="container">
+    <h2>@ViewData["Title"]</h2>
+    <p class="text-muted">Statistics for course registrations in the @Model.Semester semester.</p>
+    
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <form asp-action="RegistrationReport" method="get" class="row g-3">
+                <div class="col-auto">
+                    <label for="semester" class="form-label">Select Semester:</label>
+                </div>
+                <div class="col-auto">
+                    <select name="semester" id="semester" class="form-select" onchange="this.form.submit()">
+                        @foreach (var semester in ViewBag.AvailableSemesters)
+                        {
+                            if (semester == Model.Semester)
+                            {
+                                <option value="@semester" selected>@semester</option>
+                            }
+                            else
+                            {
+                                <option value="@semester">@semester</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-6 text-end">
+            <a asp-action="Courses" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Manage Courses
+            </a>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Course Code</th>
+                            <th>Course Title</th>
+                            <th>Capacity</th>
+                            <th>Registered</th>
+                            <th>Available Seats</th>
+                            <th>Fill Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.CourseRegistrations.Any())
+                        {
+                            @foreach (var report in Model.CourseRegistrations)
+                            {
+                                <tr>
+                                    <td>@report.CourseCode</td>
+                                    <td>@report.CourseTitle</td>
+                                    <td>@report.TotalSeats</td>
+                                    <td>@report.RegisteredStudents</td>
+                                    <td>@report.AvailableSeats</td>
+                                    <td>
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar @GetProgressBarClass(report.FillRate)" 
+                                                 role="progressbar" 
+                                                 style="width: @(report.FillRate)%;" 
+                                                 aria-valuenow="@report.FillRate" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="100">
+                                                @($"{report.FillRate:F1}%")
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center">No course registrations found for this semester.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Registration Summary</h5>
+                </div>
+                <div class="card-body">
+                    @{
+                        var totalCourses = Model.CourseRegistrations.Count();
+                        var totalSeats = Model.CourseRegistrations.Sum(c => c.TotalSeats);
+                        var totalRegistered = Model.CourseRegistrations.Sum(c => c.RegisteredStudents);
+                        var totalAvailable = totalSeats - totalRegistered;
+                        var overallFillRate = totalSeats > 0 ? (totalRegistered * 100.0) / totalSeats : 0;
+                        
+                        var fullCourses = Model.CourseRegistrations.Count(c => c.AvailableSeats == 0);
+                        var nearlyCourses = Model.CourseRegistrations.Count(c => c.FillRate >= 80 && c.FillRate < 100);
+                        var lowCourses = Model.CourseRegistrations.Count(c => c.FillRate < 30);
+                    }
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-6">
+                            <p><strong>Total Courses:</strong></p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p class="text-end">@totalCourses</p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-6">
+                            <p><strong>Total Seats:</strong></p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p class="text-end">@totalSeats</p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-6">
+                            <p><strong>Total Registrations:</strong></p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p class="text-end">@totalRegistered</p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-6">
+                            <p><strong>Available Seats:</strong></p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p class="text-end">@totalAvailable</p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-6">
+                            <p><strong>Overall Fill Rate:</strong></p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p class="text-end">@($"{overallFillRate:F1}%")</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Course Status</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Full Courses (@fullCourses)</strong></label>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar bg-danger" role="progressbar" 
+                                 style="width: @(totalCourses > 0 ? (fullCourses * 100.0) / totalCourses : 0)%;" 
+                                 aria-valuenow="@fullCourses" aria-valuemin="0" aria-valuemax="@totalCourses">
+                                @fullCourses
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Nearly Full Courses (80-99%) (@nearlyCourses)</strong></label>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar bg-warning" role="progressbar" 
+                                 style="width: @(totalCourses > 0 ? (nearlyCourses * 100.0) / totalCourses : 0)%;" 
+                                 aria-valuenow="@nearlyCourses" aria-valuemin="0" aria-valuemax="@totalCourses">
+                                @nearlyCourses
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Low Enrollment Courses (< 30%) (@lowCourses)</strong></label>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar bg-info" role="progressbar" 
+                                 style="width: @(totalCourses > 0 ? (lowCourses * 100.0) / totalCourses : 0)%;" 
+                                 aria-valuenow="@lowCourses" aria-valuemin="0" aria-valuemax="@totalCourses">
+                                @lowCourses
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    public string GetProgressBarClass(double fillRate)
+    {
+        if (fillRate >= 90)
+            return "bg-danger";
+        else if (fillRate >= 70)
+            return "bg-warning";
+        else if (fillRate >= 50)
+            return "bg-info";
+        else
+            return "bg-success";
+    }
+} 

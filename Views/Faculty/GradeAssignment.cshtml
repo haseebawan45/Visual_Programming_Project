@@ -1,0 +1,76 @@
+@model AuthWebApp.ViewModels.GradeAssignmentViewModel
+
+@{
+    ViewData["Title"] = "Grade Assignment";
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2>@ViewData["Title"]</h2>
+            <hr />
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Assignment Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Assignment:</strong> @Model.AssignmentTitle</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Student:</strong> @Model.StudentName (@Model.StudentId)</p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Submission Date:</strong> @Model.SubmissionDate?.ToString("MMM dd, yyyy HH:mm")</p>
+                        </div>
+                    </div>
+                    
+                    @if (!string.IsNullOrEmpty(Model.FilePath))
+                    {
+                        <div class="mb-3">
+                            <a href="@Model.FilePath" target="_blank" class="btn btn-primary">
+                                <i class="fas fa-download"></i> Download Submission
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+            
+            <form asp-action="GradeAssignment" method="post">
+                <input type="hidden" asp-for="AssignmentId" />
+                <input type="hidden" asp-for="AssignmentTitle" />
+                <input type="hidden" asp-for="StudentName" />
+                <input type="hidden" asp-for="StudentId" />
+                <input type="hidden" asp-for="SubmissionDate" />
+                <input type="hidden" asp-for="FilePath" />
+                
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                
+                <div class="mb-3">
+                    <label asp-for="Grade" class="form-label">Grade (out of 100)</label>
+                    <input asp-for="Grade" class="form-control" type="number" min="0" max="100" step="0.1" />
+                    <span asp-validation-for="Grade" class="text-danger"></span>
+                </div>
+                
+                <div class="mb-3">
+                    <label asp-for="Feedback" class="form-label">Feedback</label>
+                    <textarea asp-for="Feedback" class="form-control" rows="5"></textarea>
+                    <span asp-validation-for="Feedback" class="text-danger"></span>
+                </div>
+                
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary">Submit Grade</button>
+                    <a asp-action="Assignments" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 

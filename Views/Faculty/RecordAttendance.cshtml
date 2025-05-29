@@ -1,0 +1,78 @@
+@model AuthWebApp.ViewModels.RecordAttendanceViewModel
+
+@{
+    ViewData["Title"] = "Record Attendance";
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <h2>@ViewData["Title"] - @Model.CourseName</h2>
+            <hr />
+            
+            <form asp-action="RecordAttendance" method="post">
+                <input type="hidden" asp-for="CourseId" />
+                <input type="hidden" asp-for="CourseName" />
+                
+                <div class="mb-3">
+                    <label asp-for="Date" class="form-label">Date</label>
+                    <input asp-for="Date" class="form-control" type="date" />
+                    <span asp-validation-for="Date" class="text-danger"></span>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-1">#</div>
+                            <div class="col-3">Student ID</div>
+                            <div class="col-3">Name</div>
+                            <div class="col-3">Status</div>
+                            <div class="col-2">Remarks</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.Students != null && Model.Students.Any())
+                        {
+                            @for (int i = 0; i < Model.Students.Count; i++)
+                            {
+                                <div class="row mb-2 align-items-center">
+                                    <div class="col-1">@(i + 1)</div>
+                                    <div class="col-3">
+                                        <input type="hidden" asp-for="@Model.Students[i].StudentId" />
+                                        <input type="hidden" asp-for="@Model.Students[i].StudentName" />
+                                        @Model.Students[i].StudentName
+                                    </div>
+                                    <div class="col-3">
+                                        @Model.Students[i].StudentId
+                                    </div>
+                                    <div class="col-3">
+                                        <select asp-for="@Model.Students[i].Status" asp-items="Html.GetEnumSelectList<AuthWebApp.Models.AttendanceStatus>()" class="form-select">
+                                        </select>
+                                    </div>
+                                    <div class="col-2">
+                                        <input asp-for="@Model.Students[i].Remarks" class="form-control" placeholder="Optional" />
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="alert alert-info">
+                                No students enrolled in this course.
+                            </div>
+                        }
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary">Save Attendance</button>
+                    <a asp-action="CourseDetails" asp-route-id="@Model.CourseId" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 

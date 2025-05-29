@@ -1,0 +1,144 @@
+@model AuthWebApp.ViewModels.FacultyDashboardViewModel
+
+@{
+    ViewData["Title"] = "Faculty Dashboard";
+}
+
+<div class="container py-4">
+    <h2>Welcome, @Model.Faculty.FirstName!</h2>
+    
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">My Courses</h5>
+                    <h2 class="display-4">@Model.Courses.Count()</h2>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" asp-action="MyCourses">View Details</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-success text-white mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Students</h5>
+                    <h2 class="display-4">@Model.TotalStudents</h2>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" asp-action="MyCourses">View Courses</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-warning text-white mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Pending Assignments</h5>
+                    <h2 class="display-4">@Model.PendingAssignments</h2>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" asp-action="Assignments">View Details</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-info text-white mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Announcements</h5>
+                    <h2 class="display-4">@Model.RecentAnnouncements.Count()</h2>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <span class="small text-white">Recent Updates</span>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-book me-1"></i>
+                    My Courses
+                </div>
+                <div class="card-body">
+                    @if (Model.Courses.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Course Code</th>
+                                        <th>Title</th>
+                                        <th>Students</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var course in Model.Courses)
+                                    {
+                                        <tr>
+                                            <td>@course.CourseCode</td>
+                                            <td>@course.Title</td>
+                                            <td>
+                                                @(course.Registrations?.Count(r => r.Status == RegistrationStatus.Approved) ?? 0) / @course.MaxCapacity
+                                            </td>
+                                            <td>
+                                                <a asp-action="CourseDetails" asp-route-id="@course.CourseId" class="btn btn-sm btn-primary">View</a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p>You have no courses assigned yet.</p>
+                    }
+                </div>
+                <div class="card-footer small text-muted">
+                    <a asp-action="MyCourses" class="btn btn-outline-primary">View All Courses</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-bullhorn me-1"></i>
+                    Recent Announcements
+                </div>
+                <div class="card-body">
+                    @if (Model.RecentAnnouncements.Any())
+                    {
+                        <div class="list-group">
+                            @foreach (var announcement in Model.RecentAnnouncements)
+                            {
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">@announcement.Title</h5>
+                                        <small>@announcement.PostedDate.ToString("MMM dd, yyyy")</small>
+                                    </div>
+                                    <p class="mb-1">@(announcement.Content.Length > 100 ? announcement.Content.Substring(0, 100) + "..." : announcement.Content)</p>
+                                    <small>@announcement.Course.Title</small>
+                                </a>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p>No recent announcements.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

@@ -1,0 +1,127 @@
+@model AuthWebApp.ViewModels.EditUserViewModel
+
+@{
+    ViewData["Title"] = "Edit User";
+}
+
+<div class="container">
+    <h2>@ViewData["Title"]</h2>
+    <p class="text-muted">Edit user information for @Model.FirstName @Model.LastName.</p>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <form asp-controller="Admin" asp-action="EditUser" method="post">
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="Role" />
+                
+                <div asp-validation-summary="All" class="text-danger"></div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="FirstName"></label>
+                            <input asp-for="FirstName" class="form-control" />
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="LastName"></label>
+                            <input asp-for="LastName" class="form-control" />
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label asp-for="Email"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label asp-for="Role"></label>
+                    <input asp-for="Role" class="form-control" readonly />
+                </div>
+                
+                @if (Model.Role == "Student")
+                {
+                    <div id="student-fields" class="mb-3">
+                        <h5>Student Information</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="StudentId"></label>
+                                    <input asp-for="StudentId" class="form-control" />
+                                    <span asp-validation-for="StudentId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Program"></label>
+                                    <input asp-for="Program" class="form-control" />
+                                    <span asp-validation-for="Program" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Semester"></label>
+                            <input asp-for="Semester" class="form-control" type="number" min="1" max="12" />
+                            <span asp-validation-for="Semester" class="text-danger"></span>
+                        </div>
+                    </div>
+                }
+                
+                @if (Model.Role == "Faculty")
+                {
+                    <div id="faculty-fields" class="mb-3">
+                        <h5>Faculty Information</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="FacultyId"></label>
+                                    <input asp-for="FacultyId" class="form-control" />
+                                    <span asp-validation-for="FacultyId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Department"></label>
+                                    <input asp-for="Department" class="form-control" />
+                                    <span asp-validation-for="Department" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Position"></label>
+                            <input asp-for="Position" class="form-control" />
+                            <span asp-validation-for="Position" class="text-danger"></span>
+                        </div>
+                    </div>
+                }
+
+                <div class="form-group mb-3 mt-4">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <a asp-action="Users" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    Information
+                </div>
+                <div class="card-body">
+                    <p>Edit the user information.</p>
+                    <p>Note that you cannot change the user's role once it has been set.</p>
+                    <p>If you need to change a user's role, please delete the account and create a new one.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+} 

@@ -1,0 +1,82 @@
+@model AuthWebApp.ViewModels.AttendanceReportViewModel
+
+@{
+    ViewData["Title"] = "Attendance Report";
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <h2>@ViewData["Title"] - @Model.CourseName</h2>
+            <hr />
+            
+            <div class="mb-3">
+                <a asp-action="RecordAttendance" asp-route-courseId="@Model.CourseId" class="btn btn-primary">
+                    <i class="fas fa-clipboard-check"></i> Record New Attendance
+                </a>
+                <a asp-action="CourseDetails" asp-route-id="@Model.CourseId" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Course Details
+                </a>
+            </div>
+            
+            @if (Model.AttendanceReports != null && Model.AttendanceReports.Any())
+            {
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Attendance Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Student ID</th>
+                                        <th>Name</th>
+                                        <th>Present</th>
+                                        <th>Absent</th>
+                                        <th>Late</th>
+                                        <th>Excused</th>
+                                        <th>Total Classes</th>
+                                        <th>Attendance %</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var report in Model.AttendanceReports)
+                                    {
+                                        <tr>
+                                            <td>@report.StudentId</td>
+                                            <td>@report.StudentName</td>
+                                            <td>@report.Present</td>
+                                            <td>@report.Absent</td>
+                                            <td>@report.Late</td>
+                                            <td>@report.Excused</td>
+                                            <td>@report.TotalClasses</td>
+                                            <td>
+                                                <div class="progress">
+                                                    <div class="progress-bar @(report.AttendancePercentage < 75 ? "bg-danger" : report.AttendancePercentage < 85 ? "bg-warning" : "bg-success")" 
+                                                         role="progressbar" 
+                                                         style="width: @report.AttendancePercentage%;" 
+                                                         aria-valuenow="@report.AttendancePercentage" 
+                                                         aria-valuemin="0" 
+                                                         aria-valuemax="100">
+                                                        @report.AttendancePercentage%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <p>No attendance data available for this course yet.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div> 

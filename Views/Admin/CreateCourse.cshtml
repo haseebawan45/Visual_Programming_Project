@@ -1,0 +1,107 @@
+@model AuthWebApp.ViewModels.CreateCourseViewModel
+
+@{
+    ViewData["Title"] = "Create Course";
+}
+
+<div class="container">
+    <h2>@ViewData["Title"]</h2>
+    <p class="text-muted">Add a new course to the system.</p>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <form asp-controller="Admin" asp-action="CreateCourse" method="post">
+                <div asp-validation-summary="All" class="text-danger"></div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="CourseCode"></label>
+                            <input asp-for="CourseCode" class="form-control" />
+                            <span asp-validation-for="CourseCode" class="text-danger"></span>
+                            <small class="form-text text-muted">E.g., CS101, MATH201</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="CreditHours"></label>
+                            <input asp-for="CreditHours" class="form-control" type="number" min="1" max="6" />
+                            <span asp-validation-for="CreditHours" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label asp-for="Title"></label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label asp-for="Description"></label>
+                    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="Semester"></label>
+                            <input asp-for="Semester" class="form-control" />
+                            <span asp-validation-for="Semester" class="text-danger"></span>
+                            <small class="form-text text-muted">E.g., Fall 2023, Spring 2024</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="MaxCapacity"></label>
+                            <input asp-for="MaxCapacity" class="form-control" type="number" min="1" max="200" />
+                            <span asp-validation-for="MaxCapacity" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label asp-for="Prerequisites"></label>
+                    <input asp-for="Prerequisites" class="form-control" />
+                    <span asp-validation-for="Prerequisites" class="text-danger"></span>
+                    <small class="form-text text-muted">Comma-separated list of prerequisite course codes (e.g., CS101, MATH201)</small>
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label asp-for="FacultyId"></label>
+                    <select asp-for="FacultyId" class="form-control">
+                        <option value="">-- Select Faculty --</option>
+                        @foreach (var faculty in ViewBag.AvailableFaculty)
+                        {
+                            <option value="@faculty.Id">@($"{faculty.FirstName} {faculty.LastName} ({faculty.Department})")</option>
+                        }
+                    </select>
+                    <span asp-validation-for="FacultyId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3 mt-4">
+                    <button type="submit" class="btn btn-primary">Create Course</button>
+                    <a asp-action="Courses" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    Information
+                </div>
+                <div class="card-body">
+                    <p>Fill in all the required fields to create a new course.</p>
+                    <p>Each course must have a unique course code.</p>
+                    <p>Make sure to assign a faculty member to teach the course.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+} 

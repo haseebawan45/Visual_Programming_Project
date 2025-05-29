@@ -1,0 +1,55 @@
+@model AuthWebApp.ViewModels.FacultyCoursesViewModel
+
+@{
+    ViewData["Title"] = "My Courses";
+}
+
+<div class="container py-4">
+    <h2>@ViewData["Title"]</h2>
+    
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <p class="lead">View and manage the courses you teach</p>
+        </div>
+    </div>
+    
+    @if (Model.Courses.Any())
+    {
+        <div class="row">
+            @foreach (var course in Model.Courses)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="card-title">@course.CourseCode - @course.Title</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">@(course.Description ?? "No description available.")</p>
+                            <div class="small text-muted mb-2">
+                                <div><strong>Credit Hours:</strong> @course.CreditHours</div>
+                                <div><strong>Semester:</strong> @course.Semester</div>
+                                <div><strong>Students:</strong> @(course.Registrations?.Count(r => r.Status == RegistrationStatus.Approved) ?? 0) / @course.MaxCapacity</div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="d-grid gap-2">
+                                <a asp-action="CourseDetails" asp-route-id="@course.CourseId" class="btn btn-primary">View Details</a>
+                                <div class="btn-group">
+                                    <a asp-action="CreateAssignment" asp-route-courseId="@course.CourseId" class="btn btn-outline-primary">Add Assignment</a>
+                                    <a asp-action="UploadContent" asp-route-courseId="@course.CourseId" class="btn btn-outline-success">Upload Content</a>
+                                    <a asp-action="RecordAttendance" asp-route-courseId="@course.CourseId" class="btn btn-outline-warning">Attendance</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <p>You don't have any courses assigned to you yet.</p>
+        </div>
+    }
+</div> 

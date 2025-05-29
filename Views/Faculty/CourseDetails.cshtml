@@ -1,0 +1,260 @@
+@model AuthWebApp.ViewModels.CourseDetailsViewModel
+
+@{
+    ViewData["Title"] = "Course Details";
+}
+
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>@Model.Course.CourseCode - @Model.Course.Title</h2>
+            <p class="lead">@Model.Course.Description</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="btn-group">
+                <a asp-action="CreateAssignment" asp-route-courseId="@Model.Course.CourseId" class="btn btn-primary">
+                    <i class="fas fa-plus-circle"></i> Assignment
+                </a>
+                <a asp-action="UploadContent" asp-route-courseId="@Model.Course.CourseId" class="btn btn-success">
+                    <i class="fas fa-upload"></i> Content
+                </a>
+                <a asp-action="CreateAnnouncement" asp-route-courseId="@Model.Course.CourseId" class="btn btn-info">
+                    <i class="fas fa-bullhorn"></i> Announcement
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header">Course Details</div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Credit Hours
+                            <span class="badge bg-primary rounded-pill">@Model.Course.CreditHours</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Semester
+                            <span class="badge bg-secondary rounded-pill">@Model.Course.Semester</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Students
+                            <span class="badge bg-success rounded-pill">@Model.EnrolledStudents.Count() / @Model.Course.MaxCapacity</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <ul class="nav nav-tabs" id="courseTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="students-tab" data-bs-toggle="tab" data-bs-target="#students" type="button" role="tab" aria-controls="students" aria-selected="true">Students</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="assignments-tab" data-bs-toggle="tab" data-bs-target="#assignments" type="button" role="tab" aria-controls="assignments" aria-selected="false">Assignments</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="content-tab" data-bs-toggle="tab" data-bs-target="#content" type="button" role="tab" aria-controls="content" aria-selected="false">Course Content</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="announcements-tab" data-bs-toggle="tab" data-bs-target="#announcements" type="button" role="tab" aria-controls="announcements" aria-selected="false">Announcements</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="attendance-tab" data-bs-toggle="tab" data-bs-target="#attendance" type="button" role="tab" aria-controls="attendance" aria-selected="false">Attendance</button>
+                </li>
+            </ul>
+            <div class="tab-content p-3 border border-top-0 rounded-bottom" id="courseTabContent">
+                <div class="tab-pane fade show active" id="students" role="tabpanel" aria-labelledby="students-tab">
+                    @if (Model.EnrolledStudents.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Student ID</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Program</th>
+                                        <th>Semester</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var student in Model.EnrolledStudents)
+                                    {
+                                        <tr>
+                                            <td>@student.StudentId</td>
+                                            <td>@student.FirstName @student.LastName</td>
+                                            <td>@student.Email</td>
+                                            <td>@student.Program</td>
+                                            <td>@student.Semester</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p>No students enrolled in this course yet.</p>
+                    }
+                </div>
+                <div class="tab-pane fade" id="assignments" role="tabpanel" aria-labelledby="assignments-tab">
+                    <div class="d-flex justify-content-end mb-3">
+                        <a asp-action="CreateAssignment" asp-route-courseId="@Model.Course.CourseId" class="btn btn-primary">
+                            <i class="fas fa-plus-circle"></i> New Assignment
+                        </a>
+                    </div>
+                    
+                    @if (Model.Assignments.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Due Date</th>
+                                        <th>Submissions</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var assignment in Model.Assignments)
+                                    {
+                                        <tr>
+                                            <td>@assignment.Title</td>
+                                            <td>@assignment.DueDate.ToString("MMM dd, yyyy")</td>
+                                            <td>
+                                                @if (assignment.StudentId != null)
+                                                {
+                                                    <span class="badge bg-success">Submitted</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning">Pending</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (assignment.StudentId != null && !assignment.Grade.HasValue)
+                                                {
+                                                    <a asp-action="GradeAssignment" asp-route-id="@assignment.AssignmentId" class="btn btn-sm btn-primary">Grade</a>
+                                                }
+                                                else if (assignment.Grade.HasValue)
+                                                {
+                                                    <span class="badge bg-info">Graded: @assignment.Grade</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">No Submission</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p>No assignments created for this course yet.</p>
+                    }
+                </div>
+                <div class="tab-pane fade" id="content" role="tabpanel" aria-labelledby="content-tab">
+                    <div class="d-flex justify-content-end mb-3">
+                        <a asp-action="UploadContent" asp-route-courseId="@Model.Course.CourseId" class="btn btn-success">
+                            <i class="fas fa-upload"></i> Upload Content
+                        </a>
+                    </div>
+                    
+                    @if (Model.CourseContents.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Type</th>
+                                        <th>Upload Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var content in Model.CourseContents)
+                                    {
+                                        <tr>
+                                            <td>@content.Title</td>
+                                            <td><span class="badge bg-info">@content.Type</span></td>
+                                            <td>@content.UploadDate.ToString("MMM dd, yyyy")</td>
+                                            <td>
+                                                <a href="@content.FilePath" target="_blank" class="btn btn-sm btn-primary">Download</a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p>No content uploaded for this course yet.</p>
+                    }
+                </div>
+                <div class="tab-pane fade" id="announcements" role="tabpanel" aria-labelledby="announcements-tab">
+                    <div class="d-flex justify-content-end mb-3">
+                        <a asp-action="CreateAnnouncement" asp-route-courseId="@Model.Course.CourseId" class="btn btn-info">
+                            <i class="fas fa-bullhorn"></i> New Announcement
+                        </a>
+                    </div>
+                    
+                    @if (Model.Announcements.Any())
+                    {
+                        <div class="list-group">
+                            @foreach (var announcement in Model.Announcements)
+                            {
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">@announcement.Title</h5>
+                                        <small>@announcement.PostedDate.ToString("MMM dd, yyyy")</small>
+                                    </div>
+                                    <p class="mb-1">@announcement.Content</p>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p>No announcements posted for this course yet.</p>
+                    }
+                </div>
+                <div class="tab-pane fade" id="attendance" role="tabpanel" aria-labelledby="attendance-tab">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <a asp-action="RecordAttendance" asp-route-courseId="@Model.Course.CourseId" class="btn btn-warning">
+                                <i class="fas fa-clipboard-check"></i> Record Attendance
+                            </a>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <a asp-action="AttendanceReport" asp-route-courseId="@Model.Course.CourseId" class="btn btn-primary">
+                                <i class="fas fa-chart-bar"></i> Attendance Report
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <p>Use the buttons above to record daily attendance or view detailed attendance reports.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function() {
+            $('#courseTab button').on('click', function (e) {
+                e.preventDefault();
+                $(this).tab('show');
+            });
+        });
+    </script>
+} 

@@ -15,6 +15,9 @@ namespace AuthWebApp.Data
         public DbSet<CourseRegistration> CourseRegistrations { get; set; }
         public DbSet<Assignment> Assignments { get; set; }
         public DbSet<FeeRecord> FeeRecords { get; set; }
+        public DbSet<Announcement> Announcements { get; set; }
+        public DbSet<CourseContent> CourseContents { get; set; }
+        public DbSet<Attendance> Attendances { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -49,6 +52,31 @@ namespace AuthWebApp.Data
                 .HasOne(f => f.Student)
                 .WithMany(s => s.FeeRecords)
                 .HasForeignKey(f => f.StudentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configure relationships for new models
+            builder.Entity<Announcement>()
+                .HasOne(a => a.Course)
+                .WithMany()
+                .HasForeignKey(a => a.CourseId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<CourseContent>()
+                .HasOne(cc => cc.Course)
+                .WithMany()
+                .HasForeignKey(cc => cc.CourseId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Attendance>()
+                .HasOne(a => a.Course)
+                .WithMany()
+                .HasForeignKey(a => a.CourseId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Attendance>()
+                .HasOne(a => a.Student)
+                .WithMany()
+                .HasForeignKey(a => a.StudentId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

@@ -1,0 +1,55 @@
+@model AuthWebApp.ViewModels.UploadContentViewModel
+
+@{
+    ViewData["Title"] = "Upload Course Content";
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2>@ViewData["Title"]</h2>
+            <hr />
+            
+            <form asp-action="UploadContent" method="post" enctype="multipart/form-data">
+                <input type="hidden" asp-for="CourseId" />
+                
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                
+                <div class="mb-3">
+                    <label asp-for="Title" class="form-label">Content Title</label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+                
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label">Description</label>
+                    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+                
+                <div class="mb-3">
+                    <label asp-for="Type" class="form-label">Content Type</label>
+                    <select asp-for="Type" asp-items="Html.GetEnumSelectList<AuthWebApp.Models.ContentType>()" class="form-select">
+                        <option selected disabled>-- Select Content Type --</option>
+                    </select>
+                    <span asp-validation-for="Type" class="text-danger"></span>
+                </div>
+                
+                <div class="mb-3">
+                    <label asp-for="File" class="form-label">Upload File</label>
+                    <input asp-for="File" class="form-control" type="file" />
+                    <span asp-validation-for="File" class="text-danger"></span>
+                </div>
+                
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary">Upload Content</button>
+                    <a asp-action="CourseDetails" asp-route-id="@Model.CourseId" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 

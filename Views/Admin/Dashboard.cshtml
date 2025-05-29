@@ -1,0 +1,122 @@
+@model AuthWebApp.ViewModels.AdminDashboardViewModel
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container">
+    <h2>@ViewData["Title"]</h2>
+    <p class="text-muted">Welcome to the administrator control panel.</p>
+    
+    <div class="row mt-4">
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card border-primary h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Students</h5>
+                    <p class="card-text display-4">@Model.TotalStudents</p>
+                    <a asp-action="Users" class="btn btn-sm btn-outline-primary">Manage Students</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card border-success h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Faculty</h5>
+                    <p class="card-text display-4">@Model.TotalFaculty</p>
+                    <a asp-action="Users" class="btn btn-sm btn-outline-success">Manage Faculty</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card border-info h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Courses</h5>
+                    <p class="card-text display-4">@Model.TotalCourses</p>
+                    <a asp-action="Courses" class="btn btn-sm btn-outline-info">Manage Courses</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card border-warning h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Registrations</h5>
+                    <p class="card-text display-4">@Model.TotalRegistrations</p>
+                    <a asp-action="RegistrationReport" class="btn btn-sm btn-outline-warning">View Report</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <h4 class="mt-4">Financial Overview</h4>
+    <div class="row mt-3">
+        <div class="col-md-6 mb-4">
+            <div class="card border-success h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Fees Collected</h5>
+                    <p class="card-text display-4">@Model.TotalFeesCollected.ToString("C")</p>
+                    <div class="progress">
+                        @{
+                            var totalFees = Model.TotalFeesCollected + Model.TotalOutstandingFees;
+                            var collectionRate = totalFees > 0 ? (Model.TotalFeesCollected * 100) / totalFees : 0;
+                        }
+                        <div class="progress-bar bg-success" role="progressbar" style="width: @collectionRate%;" 
+                            aria-valuenow="@collectionRate" aria-valuemin="0" aria-valuemax="100">@collectionRate%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="card border-danger h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Outstanding Fees</h5>
+                    <p class="card-text display-4">@Model.TotalOutstandingFees.ToString("C")</p>
+                    <a asp-action="FeeReport" class="btn btn-sm btn-outline-danger">View Fee Report</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    Quick Actions
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="@Url.Action("CreateUser")" class="list-group-item list-group-item-action">
+                            <i class="bi bi-person-plus"></i> Add New User
+                        </a>
+                        <a href="@Url.Action("CreateCourse")" class="list-group-item list-group-item-action">
+                            <i class="bi bi-journal-plus"></i> Add New Course
+                        </a>
+                        <a href="@Url.Action("RegistrationReport")" class="list-group-item list-group-item-action">
+                            <i class="bi bi-bar-chart"></i> Registration Reports
+                        </a>
+                        <a href="@Url.Action("FeeReport")" class="list-group-item list-group-item-action">
+                            <i class="bi bi-cash"></i> Fee Reports
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    System Information
+                </div>
+                <div class="card-body">
+                    <p><strong>Application:</strong> AuthWebApp</p>
+                    <p><strong>Version:</strong> 1.0.0</p>
+                    <p><strong>Environment:</strong> @Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")</p>
+                    <p><strong>Server Time:</strong> @DateTime.Now.ToString("f")</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
