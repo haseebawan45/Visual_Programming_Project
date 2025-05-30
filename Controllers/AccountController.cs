@@ -72,80 +72,8 @@ namespace AuthWebApp.Controllers
             return View(model);
         }
 
-        [HttpGet]
-        public IActionResult Register(string returnUrl = null)
-        {
-            ViewData["ReturnUrl"] = returnUrl;
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
-        {
-            ViewData["ReturnUrl"] = returnUrl;
-            if (ModelState.IsValid)
-            {
-                var user = new ApplicationUser
-                {
-                    UserName = model.Email,
-                    Email = model.Email,
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    Role = model.Role
-                };
-                
-                // Set role-specific properties
-                switch (model.Role)
-                {
-                    case UserRole.Student:
-                        user.StudentId = model.StudentId ?? $"S{new System.Random().Next(10000, 99999)}";
-                        user.Program = model.Program;
-                        user.Semester = model.Semester;
-                        break;
-                    case UserRole.Faculty:
-                        user.FacultyId = model.FacultyId ?? $"F{new System.Random().Next(10000, 99999)}";
-                        user.Department = model.Department;
-                        user.Position = model.Position;
-                        break;
-                }
-
-                var result = await _userManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
-                {
-                    // Create roles if they don't exist
-                    string roleName = model.Role.ToString();
-                    if (!await _roleManager.RoleExistsAsync(roleName))
-                    {
-                        await _roleManager.CreateAsync(new IdentityRole(roleName));
-                    }
-                    
-                    // Add user to role
-                    await _userManager.AddToRoleAsync(user, roleName);
-                    
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    
-                    // Redirect based on role
-                    switch (model.Role)
-                    {
-                        case UserRole.Student:
-                            return RedirectToAction("Dashboard", "Student");
-                        case UserRole.Faculty:
-                            return RedirectToAction("Dashboard", "Faculty");
-                        case UserRole.Admin:
-                            return RedirectToAction("Dashboard", "Admin");
-                        default:
-                            return RedirectToLocal(returnUrl);
-                    }
-                }
-
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-            }
-            return View(model);
-        }
+        // Removed public Register methods to prevent self-registration
+        // Only admins can create users through the Admin panel
 
         [HttpPost]
         [ValidateAntiForgeryToken]

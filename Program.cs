@@ -55,4 +55,55 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+// Seed admin user
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+        
+        // Create Admin role if it doesn't exist
+        if (!await roleManager.RoleExistsAsync("Admin"))
+        {
+            await roleManager.CreateAsync(new IdentityRole("Admin"));
+        }
+        
+        // Create Admin user if it doesn't exist
+        var adminEmail = "admin@au.edu.pk";
+        var adminUser = await userManager.FindByEmailAsync(adminEmail);
+        
+        if (adminUser == null)
+        {
+            adminUser = new ApplicationUser
+            {
+                UserName = adminEmail,
+                Email = adminEmail,
+                FirstName = "System",
+                LastName = "Administrator",
+                EmailConfirmed = true,
+                Role = UserRole.Admin
+            };
+            
+            var result = await userManager.CreateAsync(adminUser, "$Admin4545");
+            
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(adminUser, "Admin");
+                Console.WriteLine("Admin user created successfully.");
+            }
+            else
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                Console.WriteLine($"Failed to create admin user: {errors}");
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"An error occurred while seeding the database: {ex.Message}");
+    }
+}
+
 app.Run();

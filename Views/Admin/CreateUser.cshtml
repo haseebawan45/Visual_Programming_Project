@@ -7,7 +7,7 @@
 
 <div class="container">
     <h2>@ViewData["Title"]</h2>
-    <p class="text-muted">Add a new student or faculty member to the system.</p>
+    <p class="text-muted">Add a new student or faculty member to the system. The login credentials you create here will be provided to the user.</p>
     
     <div class="row">
         <div class="col-md-8">
@@ -35,12 +35,14 @@
                     <label asp-for="Email"></label>
                     <input asp-for="Email" class="form-control" />
                     <span asp-validation-for="Email" class="text-danger"></span>
+                    <small class="form-text text-muted">This email will be used as the login username</small>
                 </div>
                 
                 <div class="form-group mb-3">
                     <label asp-for="Password"></label>
                     <input asp-for="Password" class="form-control" />
                     <span asp-validation-for="Password" class="text-danger"></span>
+                    <small class="form-text text-muted">Create a secure password to provide to the user</small>
                 </div>
                 
                 <div class="form-group mb-3">
@@ -115,8 +117,9 @@
                     Information
                 </div>
                 <div class="card-body">
-                    <p>Fill in the form to create a new user.</p>
+                    <p>Fill in the form to create a new user account.</p>
                     <p>Choose the role to show the appropriate fields for that user type.</p>
+                    <p>Make note of the credentials to provide to the user, as they will need these to log in.</p>
                     <p>If you leave ID fields blank, they will be automatically generated.</p>
                 </div>
             </div>
