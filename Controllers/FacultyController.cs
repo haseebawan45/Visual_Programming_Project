@@ -577,6 +577,137 @@ namespace AuthWebApp.Controllers
         
         #endregion
 
+        #region Grades
+        
+        // GET: /Faculty/Grades
+        public async Task<IActionResult> Grades()
+        {
+            var faculty = await GetCurrentFacultyUserAsync();
+            
+            // Get all courses taught by this faculty
+            var courses = await _context.Courses
+                .Where(c => c.FacultyId == faculty.Id)
+                .ToListAsync();
+                
+            var courseGradesList = new List<CourseGradesViewModel>();
+            
+            foreach (var course in courses)
+            {
+                // Get all students enrolled in this course
+                var enrolledStudents = await _context.CourseRegistrations
+                    .Where(cr => cr.CourseId == course.CourseId && cr.Status == RegistrationStatus.Approved)
+                    .Include(cr => cr.Student)
+                    .ToListAsync();
+                
+                // Get all assignments for this course
+                var assignments = await _context.Assignments
+                    .Where(a => a.CourseId == course.CourseId)
+                    .ToListAsync();
+                
+                var studentGrades = new List<StudentGradeViewModel>();
+                
+                foreach (var enrollment in enrolledStudents)
+                {
+                    // Get all assignments submitted by this student for this course
+                    var studentAssignments = assignments
+                        .Where(a => a.StudentId == enrollment.StudentId)
+                        .ToList();
+                    
+                    var assignmentGrades = new List<AssignmentGradeViewModel>();
+                    double totalGrade = 0;
+                    int gradedAssignmentsCount = 0;
+                    
+                    foreach (var assignment in assignments)
+                    {
+                        var studentAssignment = studentAssignments
+                            .FirstOrDefault(sa => sa.AssignmentId == assignment.AssignmentId);
+                        
+                        var grade = studentAssignment?.Grade;
+                        
+                        assignmentGrades.Add(new AssignmentGradeViewModel
+                        {
+                            AssignmentId = assignment.AssignmentId,
+                            AssignmentTitle = assignment.Title,
+                            Grade = grade
+                        });
+                        
+                        if (grade.HasValue)
+                        {
+                            totalGrade += grade.Value;
+                            gradedAssignmentsCount++;
+                        }
+                    }
+                    
+                    // Calculate average grade
+                    double averageGrade = gradedAssignmentsCount > 0 ? totalGrade / gradedAssignmentsCount : 0;
+                    
+                    studentGrades.Add(new StudentGradeViewModel
+                    {
+                        StudentId = enrollment.StudentId,
+                        StudentName = $"{enrollment.Student.FirstName} {enrollment.Student.LastName}",
+                        AssignmentGrades = assignmentGrades,
+                        AverageGrade = Math.Round(averageGrade, 2),
+                        FinalGrade = enrollment.Grade ?? ""
+                    });
+                }
+                
+                courseGradesList.Add(new CourseGradesViewModel
+                {
+                    CourseId = course.CourseId,
+                    CourseCode = course.CourseCode,
+                    CourseTitle = course.Title,
+                    StudentGrades = studentGrades
+                });
+            }
+            
+            var model = new GradesViewModel
+            {
+                Courses = courseGradesList
+            };
+            
+            return View(model);
+        }
+        
+        // POST: /Faculty/UpdateFinalGrade
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateFinalGrade(UpdateFinalGradeViewModel model)
+        {
+            var faculty = await GetCurrentFacultyUserAsync();
+            
+            // Verify the course belongs to this faculty
+            var course = await _context.Courses
+                .FirstOrDefaultAsync(c => c.CourseId == model.CourseId && c.FacultyId == faculty.Id);
+                
+            if (course == null)
+            {
+                return NotFound();
+            }
+            
+            // Find the course registration
+            var registration = await _context.CourseRegistrations
+                .FirstOrDefaultAsync(cr => cr.CourseId == model.CourseId && 
+                                          cr.StudentId == model.StudentId && 
+                                          cr.Status == RegistrationStatus.Approved);
+                
+            if (registration == null)
+            {
+                return NotFound();
+            }
+            
+            if (ModelState.IsValid)
+            {
+                registration.Grade = model.FinalGrade;
+                await _context.SaveChangesAsync();
+                
+                return RedirectToAction(nameof(Grades));
+            }
+            
+            return RedirectToAction(nameof(Grades));
+        }
+        
+        #endregion
+
         // Helper method to get the current faculty user
         private async Task<ApplicationUser> GetCurrentFacultyUserAsync()
         {

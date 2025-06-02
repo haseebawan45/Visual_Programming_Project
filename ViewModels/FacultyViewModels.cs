@@ -113,6 +113,45 @@ namespace AuthWebApp.ViewModels
         public string Remarks { get; set; }
     }
     
+    public class GradesViewModel
+    {
+        public List<CourseGradesViewModel> Courses { get; set; }
+    }
+    
+    public class CourseGradesViewModel
+    {
+        public int CourseId { get; set; }
+        public string CourseCode { get; set; }
+        public string CourseTitle { get; set; }
+        public List<StudentGradeViewModel> StudentGrades { get; set; }
+    }
+    
+    public class StudentGradeViewModel
+    {
+        public string StudentId { get; set; }
+        public string StudentName { get; set; }
+        public List<AssignmentGradeViewModel> AssignmentGrades { get; set; }
+        public double AverageGrade { get; set; }
+        public string FinalGrade { get; set; }
+    }
+    
+    public class AssignmentGradeViewModel
+    {
+        public int AssignmentId { get; set; }
+        public string AssignmentTitle { get; set; }
+        public double? Grade { get; set; }
+    }
+    
+    public class UpdateFinalGradeViewModel
+    {
+        public int CourseId { get; set; }
+        public string StudentId { get; set; }
+        
+        [Required]
+        [StringLength(2)]
+        public string FinalGrade { get; set; }
+    }
+    
     public class AttendanceReportViewModel
     {
         public int CourseId { get; set; }

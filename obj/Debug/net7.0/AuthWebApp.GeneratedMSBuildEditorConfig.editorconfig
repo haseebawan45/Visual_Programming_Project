@@ -92,6 +92,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmFjdWx0eVxHcmFkZUFzc2lnbm1lbnQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/Programmings/asp_project/AuthWebApp/Views/Faculty/Grades.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmFjdWx0eVxHcmFkZXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/Programmings/asp_project/AuthWebApp/Views/Faculty/MyCourses.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmFjdWx0eVxNeUNvdXJzZXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
